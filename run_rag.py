@@ -6,8 +6,9 @@ from langchain_community.embeddings import OllamaEmbeddings
 
 api_key = os.getenv("OPENAI_API_KEY")
 
+vectorstore_path = "vectorstores/scotus_2023"
 vectorstore = SKLearnVectorStore(
-    persist_path="vectorstore",
+    persist_path=vectorstore_path,
     embedding=OpenAIEmbeddings(openai_api_key=api_key),
     serializer="parquet")
 
@@ -55,7 +56,12 @@ class RAGApplication:
 rag_application = RAGApplication(retriever, rag_chain)
 
 # Example usage
-question = "What did SCOTUS decide in TikTok?"
+question = "What did SCOTUS decide in nvidia v e. ohman, and can you briefly summarize the case?"
+answer = rag_application.run(question)
+print("Question:", question)
+print("Answer:", answer)
+
+question = "What did SCOTUS decide in Andrew v White?"
 answer = rag_application.run(question)
 print("Question:", question)
 print("Answer:", answer)
