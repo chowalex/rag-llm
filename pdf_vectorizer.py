@@ -4,6 +4,9 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
 
 class PDFVectorizer:
+  
+  BATCH_SIZE = 100
+  
   def __init__(self, url, metadata = {}):
     self.url = url
     self.metadata = metadata
@@ -26,16 +29,12 @@ class PDFVectorizer:
     doc_splits = []
     doc_splits.extend(text_splitter.split_text(contents))
 
-    # Create corresponding langchain documents.
-    doc_objects = []
-    for i, chunk in enumerate(doc_splits):
-      doc_objects.append(
-        Document(
-          page_content = chunk,
-          metadata = self.metadata
-          )
-      )
-
-    vectorstore.add_documents(doc_objects)
+    # Create corresponding langchain documents.    
+    for i in range(0, len(doc_splits), self.BATCH_SIZE):
+      batch = doc_splits[i: i + self.BATCH_SIZE]
+    
+      doc_objects = [Document(page_content=chunk, metadata=self.metadata) for chunk in batch]  
+      
+      vectorstore.add_documents(doc_objects)
 
     return vectorstore
